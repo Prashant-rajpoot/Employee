@@ -1,0 +1,60 @@
+{%extends 'solitonems/base.html'%}
+
+{%block page_title %}
+View Payroll Records
+
+<script>
+$(document).ready(function(){
+  $("#search_input").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#payroll_record_list tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+{%endblock%}
+
+{%block content%}
+<div class="content">
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    {%if payroll_records%}
+                    <div class="table-responsive">
+                        <div class="form-group ">
+                            <i class="fas fa-search " aria-hidden="true"></i>
+                            <input id="search_input" type="text" class="form-control" placeholder="Search....">
+                        </div>
+                        <table class="table">
+                            <thead class="thead-dark">
+                            <th>Payroll Record ID</th>
+                            <th>Month</th>
+                            <th>Year</th>
+                            <th>Archived</th>
+                            <th>Actions</th>
+                            </thead>
+                            <tbody id="payroll_record_list">
+                            {%for payroll_record in payroll_records%}
+                            <tr>
+                                <td>{{payroll_record.id}}</td>
+                                <td>{{payroll_record.month}}</td>
+                                <td>{{payroll_record.year}}</td>
+                                <td>{{payroll_record.archived}}</td>
+                                <td><a href="{%url 'payroll_record_page' payroll_record.id%}">
+                                    <button>View Payroll</button>
+                                </a></td>
+                            </tr>
+                            {%endfor%}
+                        </table>
+                    </div>
+                    {%else%}
+                    <h3>No Payroll Records Available</h3>
+                    {%endif%}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

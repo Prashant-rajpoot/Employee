@@ -1,0 +1,235 @@
+{%extends 'solitonems/base.html'%}
+
+{%block page_title %}
+Manage Payroll Records
+<script>
+$(document).ready(function(){
+  $("#search_input").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#payroll_list tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+{%endblock%}
+
+{%block content%}
+<div class="content">
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal_add_period">
+                Create Period
+            </button>
+            <a href="{%url 'review_financial_info'%}">
+                <button type="button" class="btn btn-outline">
+                    Review and Edit Financial Information
+                </button>
+            </a>
+            <div class="card">
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div{% if message.tags %} class="alert alert-warning" {% endif %}> {{ message }} </div>
+                {% endfor %}
+                {% endif %}
+                {%if payroll_records%}
+                <div class="table-responsive">
+                    <div class="form-group ">
+                        <i class="fas fa-search " aria-hidden="true"></i>
+                        <input id="search_input" type="text" class="form-control" placeholder="Search....">
+                    </div>
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <th>Payroll Record ID</th>
+                        <th>Month</th>
+                        <th>Year</th>
+                        <th>Actions</th>
+                        </thead>
+                        <tbody id="payroll_list">
+                        {%for payroll_record in payroll_records%}
+                        <tr>
+                            <td>{{payroll_record.id}}</td>
+                            <td>{{payroll_record.month}}</td>
+                            <td>{{payroll_record.year}}</td>
+                            <td>
+                                <a href="{%url 'payroll_record_page' payroll_record.id%}"
+                                   style="color: inherit">
+                                    <button class="btn btn-sm btn-primary">Generate Payroll</button>
+                                </a> |
+                                <a href="{%url 'archive_period' payroll_record.id %}"">
+                                <button class="btn btn-sm btn-success"
+                                        onclick="return confirm('Are you sure you want to archive payroll record {{payroll_record.id}}?')">
+                                    Archive</button>
+                                </a> |
+                                <a href="{%url 'delete_period' payroll_record.id %}">
+                                    <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to delete payroll record {{payroll_record.id}}?')" >
+                                        Delete</button>
+                                </a>
+                            </td>
+                        </tr>
+                        {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                {%else%}
+                <h3>No Payroll Records Available</h3>
+                {%endif%}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Modals -->
+<!-- Modal: modal-->
+<div class="modal fade" id="modal_add_period" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Add Period</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <form method="POST" action="{%url 'add_period'%}"> {%csrf_token%}
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <select class="form-control" id="month" name="month" required>
+                            <option>{{default_month}}</option>
+                            <option>January</option>
+                            <option>February</option>
+                            <option>March</option>
+                            <option>April</option>
+                            <option>May</option>
+                            <option>June</option>
+                            <option>July</option>
+                            <option>August</option>
+                            <option>September</option>
+                            <option>October</option>
+                            <option>November</option>
+                            <option>December</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Financial Year</label>
+                        <select class="form-control" id="year" name="year" required>
+                            <option>2019/2020</option>
+                            <option>2020/2021</option>
+                            <option>2021/2022</option>
+                            <option>2022/2023</option>
+                            <option>2023/2024</option>
+                            <option>2024/2025</option>
+                            <option>2025/2026</option>
+                            <option>2026/2027</option>
+                            <option>2027/2028</option>
+                            <option>2028/2029</option>
+                            <option>2029/2030</option>
+                            <option>2030/2031</option>
+                            <option>2031/2032</option>
+                            <option>2033/2034</option>
+                            <option>2034/2035</option>
+                            <option>2035/2036</option>
+                            <option>2036/2037</option>
+                            <option>2037/2038</option>
+                            <option>2038/2039</option>
+                            <option>2039/2040</option>
+                        </select>
+                    </div>
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger"
+                        type="reset">Close
+                </button>
+                <button class="btn btn-danger" type="submit">Save</button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Modal: modal-->
+<div class="modal fade" id="modal_add_period" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Add Period</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <form method="POST" action="{%url 'add_period'%}"> {%csrf_token%}
+                    <div class="form-group">
+                        <label for="month">Month</label>
+                        <select class="form-control" id="month" name="month" required>
+                            <option>January</option>
+                            <option>February</option>
+                            <option>March</option>
+                            <option>April</option>
+                            <option>May</option>
+                            <option>June</option>
+                            <option>July</option>
+                            <option>August</option>
+                            <option>September</option>
+                            <option>October</option>
+                            <option>November</option>
+                            <option>December</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="">Year</label>
+                        <select class="form-control" id="year" name="year" required>
+                            <option>2019</option>
+                            <option>2020</option>
+                            <option>2021</option>
+                            <option>2022</option>
+                            <option>2023</option>
+                            <option>2024</option>
+                            <option>2025</option>
+                            <option>2026</option>
+                            <option>2027</option>
+                            <option>2028</option>
+                            <option>2029</option>
+                            <option>2030</option>
+                            <option>2031</option>
+                            <option>2032</option>
+                            <option>2033</option>
+                            <option>2034</option>
+                            <option>2035</option>
+                            <option>2036</option>
+                            <option>2037</option>
+                            <option>2038</option>
+                            <option>2039</option>
+                            <option>2040</option>
+                        </select>
+                    </div>
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger"
+                        type="reset">Close
+                </button>
+                <button class="btn btn-danger" type="submit">Save</button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+{%endblock content%}

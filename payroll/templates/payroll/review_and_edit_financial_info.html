@@ -1,0 +1,115 @@
+{%extends 'solitonems/base.html'%}
+{% load crispy_forms_tags %}
+{%block page_title %}
+Review and Edit Financial Information
+<script>
+$(document).ready(function(){
+  $("#search_input").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#employee-table tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+{%endblock%}
+{%block content%}
+<div class="content">
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div{% if message.tags %} class="alert alert-warning" {% endif %}> {{ message }} </div>
+                {% endfor %}
+                {% endif %}
+                {%if employees%}
+                <h3 style="text-align:center;">Review and Edit Financial Information</h3>
+                <hr>
+
+                <a href="{%url 'employees_financial_csv' %}">
+                    <button class="btn btn-outline">Export CSV Template</button>
+                </a>
+
+                <button class="btn btn-primary" data-toggle="modal"
+                        data-target="#modal_add_employee_financial_data">Bulk Update</button>
+
+                <div class="table-responsive">
+                    <div class="form-group ">
+                        <i class="fas fa-search " aria-hidden="true"></i>
+                        <input id="search_input" type="text" class="form-control" placeholder="Search....">
+                    </div>
+                    <table class="table table-hover">
+                        <thead class="thead-dark">
+                        <th>Name</th>
+                        <th>Currency</th>
+                        <th>Basic Salary</th>
+                        <th>Bonus</th>
+                        <th>Local Service Allowance</th>
+                        <th>Meal Allowance</th>
+                        <th>Sacco Deduction</th>
+                        <th>Damage Deduction</th>
+                        <th>Salary Advance</th>
+                        <th>Police Fine</th>
+                        <th>Local Service Tax</th>
+                        </thead>
+                        <tbody id="employee-table">
+                        {% for employee in employees  %}
+                        <tr>
+                            <td>{{employee}}</a></td>
+                            <td>{{employee.currency}}</td>
+                            <td>{{employee.basic_salary}}</td>
+                            <td>{{employee.bonus}}</td>
+                            <td>{{employee.local_service_tax}}</td>
+                            <td>{{employee.lunch_allowance}}</td>
+                            <td>{{employee.deduction.sacco}}</td>
+                            <td>{{employee.deduction.damage}}</td>
+                            <td>{{employee.deduction.salary_advance}}</td>
+                            <td>{{employee.deduction.police_fine}}</td>
+                            <td>{{employee.statutorydeduction.local_service_tax}}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+
+                {%else%}
+
+                <h3>No active employees available</h3>
+
+                {%endif%}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modal_add_employee_financial_data" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Upload Employee Financial Data CSV</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <form method="POST" enctype="multipart/form-data"> {%csrf_token%}
+                    {{csv_form}}
+                    <div class="modal-footer">
+                        <button class="btn btn-outline-danger" type="reset">Close</button>
+                        <button class="btn btn-danger" type="submit">Save</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <!-- Modal: modalFinancialDataEmployee -->
+</div>
+</div>
+
+{%endblock content%}

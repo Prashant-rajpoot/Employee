@@ -1,0 +1,240 @@
+{%extends './base.html'%}
+{% load humanize %}
+{%load custom_filter_tags%}
+{%block page_title %}
+{{name_of_employee}}
+{%endblock%}
+{%block content%}
+<div class="content">
+    <div class="container-fluid">
+        <div class="card animated fadeInUp">
+            <div class="card-body">
+                <div class="period">
+                    <h3>{{month}} - {{year}}</h3>
+                </div>
+                <h6 class="card-category text-gray">{{name_of_employee}}</h6>
+                <h4 class="card-title">Payslip</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr>
+                            <th>Name
+                            </td>
+                            <th>{{name_of_employee}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Employee NSSF Contribution
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.employee_nssf| currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Employer NSSF Contribution
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.employer_nssf | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Total NSSF Contribution
+                            </td>
+                            <th> {{payslip.currency}} {{payslip.total_nssf_contrib | currency_filter}}</th>
+                        </tr>
+                        <tr>
+                            <th>PAYE
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.paye | currency_filter}}</td>
+                        </tr>
+
+                        <tr>
+                            <th>Local Service Tax Deduction
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.local_service_tax_deduction | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Total Statutory Deductions
+                            </td>
+                            <th> {{payslip.currency}} {{payslip.total_statutory | currency_filter}}</th>
+                        </tr>
+                        <tr>
+                            <th>Meal Allowance
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.employee.lunch_allowance | currency_filter}}</td>
+                        </tr>
+                          <tr>
+                            <th>Local Service Tax Allowance
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.employee.local_service_tax | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Overtime
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.overtime | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Bonus
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.bonus | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Sacco Deduction
+                            </td>
+                            <td> {{payslip.currency}} {{payslip.sacco_deduction | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Damage Deduction </td>
+                            <td> {{payslip.currency}} {{payslip.damage_deduction | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Salary Advance </th>
+                            <td> {{payslip.currency}} {{payslip.salary_advance | currency_filter}}</td>
+                        </tr>
+                        <tr>
+                            <th>Police Fine</th>
+                            <td>
+                                {{payslip.currency}} {{payslip.police_fine | currency_filter}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Prorate
+                            </td>
+                            <th> {{payslip.currency}} {{payslip.prorate}}</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <th>BASIC SALARY
+                            </td>
+                            <th> {{payslip.currency}} {{payslip.basic_salary | currency_filter}}</th>
+                        </tr>
+                        <tr>
+                            <th>GROSS SALARY
+                            </td>
+                            <th> {{payslip.currency}} {{payslip.gross_salary | currency_filter}}</th>
+                        </tr>
+                        <tr>
+                            <th>NET SALARY
+                            </td>
+                            <th> {{payslip.currency}} {{payslip.net_salary | currency_filter}}</th>
+                        </tr>
+                    </table>
+                </div>
+                <a href="{%url 'generate_payslip_pdf' payslip.id%}">
+                    <button class="btn btn-outline">Generate PDF</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Modal: modalAddProrate-->
+<div class="modal fade" id="modal_add_prorate" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Add Prorate</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <form method="POST" action="{%url 'add_prorate'%}"> {%csrf_token%}
+                    <div class="form-group">
+                        <label>Number of days worked</label>
+                        <input type="number" class="form-control" placeholder="Enter the number of days worked"
+                               name="no_of_days_worked" value="26" required>
+                    </div>
+                    <input type="hidden" name="payroll_id" value={{payslip.id}}>
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger"
+                        type="reset">Close
+                </button>
+                <button class="btn btn-danger" type="submit">Save</button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal: modalAddBonus-->
+<div class="modal fade" id="modal_add_bonus" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Add Bonus</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <form method="POST" action="{%url 'add_bonus'%}"> {%csrf_token%}
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <input type="number" class="form-control" placeholder="Enter the amount in Uganda shillings"
+                               name="bonus" value={{payslip.employee.basic_salary}} required>
+                    </div>
+                    <input type="hidden" name="payroll_id" value={{payslip.id}}>
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger"
+                        type="reset">Close
+                </button>
+                <button class="btn btn-danger" type="submit">Save</button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal: modalAddOvertime-->
+<div class="modal fade" id="modal_add_overtime" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Add Overtime</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <form method="POST" action="{%url 'add_overtime'%}"> {%csrf_token%}
+                    <div class="form-group">
+
+                        <input type="number" class="form-control"
+                               placeholder="Enter the number of hours on normal working days"
+                               name="number_of_hours_normal"
+                               required>
+                    </div>
+                    <div class="form-group">
+
+                        <input type="number" class="form-control" placeholder="Enter the number of hours on holidays"
+                               name="number_of_hours_holidays" required>
+                    </div>
+                    <input type="hidden" name="payroll_id" value={{payslip.id}}>
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger"
+                        type="reset">Close
+                </button>
+                <button class="btn btn-danger" type="submit">Save</button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+{%endblock%}

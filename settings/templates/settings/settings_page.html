@@ -1,0 +1,109 @@
+{%extends 'solitonems/base.html'%}
+{% load humanize %}
+{%block page_title %}
+Settings
+{%endblock%}
+{%block content%}
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title ">Currency</h4>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn-outline-danger" data-toggle="modal" data-target="#modal_add_currency">Add a
+                            currency
+                        </button>
+                        {% if messages %}
+                            {% for message in messages %}
+                           <div class="alert alert-warning">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                        {%if currencies%}
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead class="text-primary">
+                                <th>
+                                    Code
+                                </th>
+                                <th>
+                                    Description
+                                </th>
+                                <th>
+                                    Cost
+                                </th>
+                                <th>
+                                    Actions
+                                </th>
+                                </thead>
+                                <tbody>
+                                {%for currency in currencies%}
+                                <tr>
+                                    <td>{{currency.code}}</td>
+                                    <td>{{currency.desc}}</td>
+                                    <td>{{currency.cost}}</td>
+                                    <td>
+                                        <a href="{%url 'edit_currency_page' currency.id %}" style="color:inherit"><i
+                                                class="fa fa-edit"></i></a>
+                                    |
+                                        <a style="color: inherit" href="{%url 'delete_currency' currency.id%}"
+                                           onclick="return confirm('Are you sure you want to delete this currency from currencies?')">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {%endfor%}
+                                </tbody>
+                            </table>
+                        </div>
+                        {%endif%}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modal Add a currency -->
+<div class="modal fade" id="modal_add_currency" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalLabel" aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Add Currency</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+
+                <form method="POST" action="{%url 'add_currency'%}"> {%csrf_token%}
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter currency code"
+                               name="code" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter currency description"
+                               name="desc" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Enter currency cost"
+                               name="cost" required>
+                    </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button class="btn btn-outline-danger" data-dismiss="modal" type="reset">Close</button>
+                <button class="btn btn-danger" type="submit">Save</button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{%endblock%}

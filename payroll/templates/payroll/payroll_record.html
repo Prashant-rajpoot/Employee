@@ -1,0 +1,108 @@
+{%extends './base.html'%}
+{% load humanize %}
+{%load custom_filter_tags%}
+{%block page_title %}
+Payroll Records (UGX)
+<script>
+$(document).ready(function(){
+  $("#search_input").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#payroll_record_list tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+</script>
+{%endblock%}
+
+{%block content%}
+<style>
+    td,
+    th {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th[colspan] {
+        text-align: right;
+        vertical-align: middle;
+    }
+
+
+
+
+</style>
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="card  animated fadeInUp">
+            <div class="period card-header">
+                <h3>{{month}} - {{year}}</h3>
+                {%if payslips%}
+                <a href="{%url 'payroll_record_page_usd' payroll_record.id%}">
+                    <button class="btn btn-danger">Payroll Records(USD)</button>
+                </a>
+                {%endif%}
+            </div>
+            <div class="card-body">
+                {%if not payslips%}
+                <a href="{%url 'generate_payroll' payroll_record.id %}">
+                    <button class="btn btn-danger">Generate Initial
+                        Payroll
+                    </button>
+                </a>
+
+                {%else%}
+                <div class="table-responsive">
+                    <div class="form-group ">
+                        <i class="fas fa-search " aria-hidden="true"></i>
+                        <input id="search_input" type="text" class="form-control" placeholder="Search....">
+                    </div>
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <th>Emp. ID</th>
+                        <th>Name</th>
+                        <th>Basic Pay</th>
+                        <th>Gross Pay</th>
+                        <th>NSSF Contribution</th>
+                        <th>PAYE</th>
+                        <th>Net Pay</th>
+                        <th>Actions</th>
+                        </thead>
+                        <tbody id="payroll_record_list">
+                        {%for payroll in ugx_payslips%}
+                        <tr>
+                            <td>{{payroll.employee.id}}</td>
+                            <td>{{payroll.employee}}</td>
+                            <td>{{payroll.currency}} {{payroll.basic_salary | currency_filter}}</td>
+                            <td>{{payroll.currency}} {{payroll.gross_salary | currency_filter}}</td>
+                            <td>{{payroll.currency}} {{payroll.total_nssf_contrib | currency_filter}}</td>
+                            <td>{{payroll.currency}} {{ payroll.paye| currency_filter}}</td>
+                            <td>{{payroll.currency}} {{payroll.net_salary | currency_filter }}</td>
+                            <td><a href="{%url 'payslip_page' payroll.id%}"
+                                   style="color: inherit"><button>View Payslip</button></a></td>
+                        </tr>
+                        {%endfor%}
+                        <tr>
+                            <td colspan="2">Total</td>
+                            <td>UGX {{total_basic_pay | currency_filter}}</td>
+                            <td>UGX {{total_gross_pay | currency_filter}}</td>
+                            <td>UGX {{total_nssf_contribution | currency_filter}}</td>
+                            <td>UGX {{total_paye | currency_filter}}</td>
+                            <td>UGX {{total_net_pay | currency_filter}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{%url 'payroll_download' payroll_record.id %}">
+                    <button class="btn btn-outline">Export Excel CSV</button>
+                </a>
+                <a href="{%url 'generate_payroll_ugx_pdf' payroll_record.id %}">
+                    <button class="btn btn-outline">Export PDF</button>
+                </a>
+            </div>
+        </div>
+        {%endif%}
+    </div>
+</div>
+{%endblock%}

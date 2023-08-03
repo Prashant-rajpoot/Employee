@@ -1,0 +1,111 @@
+{%extends 'solitonems/base.html'%}
+{% load humanize %}
+{%load custom_filter_tags%}
+{% load static %}
+{% block page_title %}
+Overtime Application
+{% endblock %}
+
+{%block content%}
+<div class="content">
+    <div class="container-fluid">
+        <button class="btn btn-danger" data-toggle="modal"
+                data-target="#modal_apply_overtime">Apply for overtime</button>
+        <div class="card animated fadeInUp">
+            <div class="card-body">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-warning">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <h3>Recent Applications</h3>
+                {%if recent_applications%}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Start time</th>
+                        <th>End time</th>
+                        <th>Hours</th>
+                        <th>Description</th>
+                        <th>Overtime Pay</th>
+                        <th>Approval Status</th>
+                        <th>Actions</th>
+                        </thead>
+                        {%for recent_application in recent_applications%}
+                        <tr>
+                            <td>{{recent_application.id}}</td>
+                            <td>{{recent_application.date}}</td>
+                            <td>{{recent_application.start_time}}</td>
+                            <td>{{recent_application.end_time}}</td>
+                            <td>{{recent_application.number_of_hours}}</td>
+                            <td>{{recent_application.description}}</td>
+                            <td>{{recent_application.applicant.currency}} {{recent_application.overtime_pay | currency_filter}}</td>
+                            <td {% if recent_application.status == "Approved" %}
+                            style="color:green"
+                            {%elif recent_application.status == "Pending" %}
+                            style="color:black"
+                            {%else%}
+                            style="color:red"
+                            {%endif%}
+                            >{{recent_application.status}}</td>
+                            <td>
+                                {%if recent_application.status == "Pending"%}
+                                <a href="{%url 'revert_overtime_application' recent_application.id %}"  onclick="return confirm('Are you sure to revert overtime application?')">
+                                    <button class="btn btn-outline">Revert</button>
+                                </a>
+                                {%else%}
+                                #
+                                {%endif%}
+                            </td>
+                        </tr>
+                        {%endfor%}
+                    </table>
+                </div>
+                {%endif%}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: modalApplyOvertime -->
+<div class="modal fade" id="modal_apply_overtime" tabindex="-1" role="dialog"
+     aria-hidden="true" style="overflow-y: auto !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!-- Header -->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Overtime Application</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <!-- Body -->
+            <div class="modal-body">
+                <form method="post" action="{%url 'apply_for_overtime_page'%}">
+                    {%csrf_token%}
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input class="form-control" type="datetime-local" name="start_time" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input class="form-control" type="datetime-local" name="end_time" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" name="description"></textarea>
+                    </div>
+
+                    <input type="submit" value="submit" class="btn btn-danger"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}
